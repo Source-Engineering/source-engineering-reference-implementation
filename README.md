@@ -1,4 +1,4 @@
-# Source Engineering -- Reference Implementation
+# Reference Implementation
 
 > Working reference code for the Source Engineering discipline. TypeScript.
 
@@ -31,8 +31,8 @@ Warnings: 0
 
 The reference implementation has four layers (one per the discipline's reference architecture):
 
-- `src/layer1/` -- the typed-model layer. Composes a `DecisionTypeDefinition` with a `ModelAdapter` to produce a COTS.
-- `src/layer2/`, `src/layer3/`, `src/layer4/` -- the runtime-validation, business-guardrails, and audit-trail layers. Stubbed at v0.1; the v0.1 blueprint floors Layer 1 only. See `Source-Engineering/source-engineering-architecture/blueprints/v0.1/`.
+- `src/layer1/` - the typed-model layer. Composes a `DecisionTypeDefinition` with a `ModelAdapter` to produce a COTS.
+- `src/layer2/`, `src/layer3/`, `src/layer4/` - the runtime-validation, business-guardrails, and audit-trail layers. Stubbed at v0.1; the v0.1 blueprint floors Layer 1 only. See `Source-Engineering/source-engineering-architecture/blueprints/v0.1/`.
 
 ## Adapters
 
@@ -45,15 +45,15 @@ The reference implementation accepts any `ModelAdapter`. Two adapters ship:
 
 Two decision-types are implemented:
 
-- `src/decision-types/legal-summarization.ts` -- the legal-document summarisation decision-type.
-- `src/decision-types/transaction-routing.ts` -- the financial-transaction routing decision-type.
+- `src/decision-types/legal-summarization.ts` - the legal-document summarisation decision-type.
+- `src/decision-types/transaction-routing.ts` - the financial-transaction routing decision-type.
 
 Each decision-type implements the contract from `Source-Engineering/source-engineering-specifications/decision-types/`.
 
 ## Examples
 
-- `src/examples/legal-summarization.ts` -- runs the legal-summarization decision-type and produces a COTS.
-- `src/examples/transaction-routing.ts` -- runs the transaction-routing decision-type and produces a COTS.
+- `src/examples/legal-summarization.ts` - runs the legal-summarization decision-type and produces a COTS.
+- `src/examples/transaction-routing.ts` - runs the transaction-routing decision-type and produces a COTS.
 
 ## Tests
 
@@ -61,9 +61,9 @@ Each decision-type implements the contract from `Source-Engineering/source-engin
 
 ## Provenance
 
-- `Source-Engineering/source-engineering-specifications/cots/README.md` -- the COTS schema.
-- `Source-Engineering/source-engineering-architecture/layer-contracts/layer-1-typed-model.md` -- the Layer 1 contract.
-- `Source-Engineering/source-engineering-architecture/blueprints/v0.1/README.md` -- the v0.1 floor.
+- `Source-Engineering/source-engineering-specifications/cots/README.md` - the COTS schema.
+- `Source-Engineering/source-engineering-architecture/layer-contracts/layer-1-typed-model.md` - the Layer 1 contract.
+- `Source-Engineering/source-engineering-architecture/blueprints/v0.1/README.md` - the v0.1 floor.
 
 ## Status
 
