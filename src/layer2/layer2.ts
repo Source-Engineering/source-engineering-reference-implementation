@@ -11,7 +11,7 @@
  * Layer 3, which is the layer that can reject.
  */
 
-import type { Cots, DecisionRecord, Context, ValidationRecord } from "../cots.js";
+import type { Cots, DecisionRecord, Context, ValidationRecord, DecisionOnValidation } from "../cots.js";
 
 export type FlagType =
   | "drift-detected"
@@ -101,6 +101,29 @@ const validateDecision = (
   };
 };
 
+const validateRecursiveChains = (cots: Cots, now: string): ValidationRecord["flags"] => {
+  const flags: ValidationRecord["flags"] = [];
+  const termination = cots.evidence.chain_termination;
+
+  for (const chain of cots.evidence.evidence_chain) {
+    const items = [...chain.supporting_evidence, ...chain.contradicting_evidence];
+    const recursive = items.filter((item) => item.source_type === "model-generated");
+    if (recursive.length > 0) {
+      const policy = termination?.policy ?? "terminal";
+      const admitted = policy === "bounded_recursion" || policy === "unbounded_recursion";
+      flags.push({
+        flag_type: "segment-signal-divergence",
+        message: admitted
+          ? `Recursive evidence chain: ${recursive.length} model-generated evidence item(s) under policy '${policy}'. The chain does not terminate at a human-readable source. (RFC-0002)`
+          : `Recursive evidence chain under terminal policy: ${recursive.length} model-generated evidence item(s). The chain must resolve to human-authored sources. (RFC-0002)`,
+        detected_at: now,
+      });
+    }
+  }
+
+  return flags;
+};
+
 export class Layer2 {
   constructor(private readonly calibration: CalibrationData) {}
 
@@ -118,9 +141,17 @@ export class Layer2 {
     const now = options.now ?? new Date().toISOString();
     const validatedBy = options.validatedBy ?? "layer2-runtime-validation";
 
+    const recursiveFlags = validateRecursiveChains(cots, now);
+
     const decisions = cots.decisions.map((decision) => {
       const record = validateDecision(decision, cots.context, this.calibration, now);
-      return { ...decision, validation: { ...record, validated_by: validatedBy } };
+      const flags = [...record.flags, ...recursiveFlags];
+      const decision_on_validation: DecisionOnValidation =
+        flags.length > 0 ? (record.decision_on_validation === "escalated" ? "escalated" : "flagged") : "passed";
+      return {
+        ...decision,
+        validation: { ...record, flags, decision_on_validation, validated_by: validatedBy },
+      };
     });
 
     return { ...cots, decisions };

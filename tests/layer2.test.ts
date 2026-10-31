@@ -100,3 +100,38 @@ describe("Layer 2 (Runtime Validation)", () => {
     expect(cots.decisions[0].validation).toBeUndefined();
   });
 });
+
+describe("Layer 2 recursive chain flagging (RFC-0002)", () => {
+  const buildRecursiveCots = async () => {
+    const cots = await buildCots();
+    cots.evidence.chain_termination = { policy: "bounded_recursion", max_levels: 1 };
+    cots.evidence.evidence_chain[0].supporting_evidence[0].source_type = "model-generated";
+    return cots;
+  };
+
+  it("flags a COTS with model-generated evidence (bounded policy)", async () => {
+    const cots = await buildRecursiveCots();
+    const layer2 = new Layer2({});
+    const validated = layer2.validate(cots, { now: NOW });
+    const v = validated.decisions[0].validation!;
+    expect(v.decision_on_validation).toBe("flagged");
+    expect(v.flags.some((f) => f.message.includes("Recursive evidence chain"))).toBe(true);
+  });
+
+  it("flags a model-generated item even under the terminal default", async () => {
+    const cots = await buildRecursiveCots();
+    cots.evidence.chain_termination = undefined;
+    const layer2 = new Layer2({});
+    const validated = layer2.validate(cots, { now: NOW });
+    expect(validated.decisions[0].validation!.flags.some((f) => f.message.includes("terminal policy"))).toBe(true);
+  });
+
+  it("does not flag a COTS whose evidence is human-authored", async () => {
+    const cots = await buildCots();
+    cots.evidence.chain_termination = { policy: "terminal" };
+    cots.evidence.evidence_chain[0].supporting_evidence[0].source_type = "human-authored";
+    const layer2 = new Layer2({});
+    const validated = layer2.validate(cots, { now: NOW });
+    expect(validated.decisions[0].validation!.decision_on_validation).toBe("passed");
+  });
+});
