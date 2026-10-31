@@ -22,7 +22,7 @@ export interface Cots {
   inputs: { source_artifacts: SourceArtifact[] };
   context: Context;
   decisions: DecisionRecord[];
-  evidence: { evidence_chain: EvidenceChainEntry[] };
+  evidence: Evidence;
   validation: { feedback_surfaces: FeedbackSurface[] };
 }
 
@@ -104,6 +104,21 @@ export interface AuditEntry {
   notes: string;
 }
 
+export type SourceType = "human-authored" | "human-curated" | "model-generated" | "mixed";
+
+export type ChainTerminationPolicy = "terminal" | "bounded_recursion" | "unbounded_recursion";
+
+export interface ChainTermination {
+  policy: ChainTerminationPolicy;
+  max_levels?: number;
+}
+
+export interface Evidence {
+  /** RFC-0002 (COTS schema v1.2.0). Optional; the discipline's default is terminal. */
+  chain_termination?: ChainTermination;
+  evidence_chain: EvidenceChainEntry[];
+}
+
 export interface EvidenceChainEntry {
   decision_id: URI;
   supporting_evidence: EvidenceItem[];
@@ -127,6 +142,8 @@ export interface EvidenceItem {
   transformation: { operation: string; inputs: string[]; output: string; recorded_at: ISO8601 };
   uncertainty: { calibrated_score: CalibratedScore; basis: string };
   polarity: Polarity;
+  /** RFC-0002 (COTS schema v1.2.0). Optional; absent on pre-RFC-0002 COTSs. */
+  source_type?: SourceType;
 }
 
 export interface FeedbackSurface {
