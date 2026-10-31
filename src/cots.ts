@@ -94,6 +94,19 @@ export interface DecisionRecord {
   created_at: ISO8601;
   /** Layer 2 Validation record (COTS schema v1.1.0, RFC-0001). Optional: producers that have not floored Layer 2 do not emit it. */
   validation?: ValidationRecord;
+  /** Layer 3 GuardrailDecision (COTS schema v1.3.0, RFC-0003). Optional: producers that have not floored Layer 3 do not emit it. */
+  guardrail?: GuardrailDecision;
+}
+
+export type GuardrailOutcome = "accepted" | "rejected" | "annotated" | "escalated";
+
+export interface GuardrailDecision {
+  decision: GuardrailOutcome;
+  rule_id: URI;
+  rationale: string;
+  binding: boolean;
+  evaluated_at: ISO8601;
+  evaluated_by?: string;
 }
 
 export interface AuditEntry {
