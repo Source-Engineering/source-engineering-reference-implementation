@@ -8,6 +8,7 @@
     "build": "tsc",
     "test": "vitest run",
     "example:legal-summarization": "node dist/examples/legal-summarization.js",
+    "example:legal-summarization-anthropic": "node dist/examples/legal-summarization-anthropic.js",
     "example:transaction-routing": "node dist/examples/transaction-routing.js"
   },
   "keywords": [

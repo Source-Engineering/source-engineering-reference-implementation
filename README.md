@@ -41,6 +41,10 @@ The reference implementation accepts any `ModelAdapter`. Two adapters ship:
 - `src/adapters/mock-adapter.ts` -- a deterministic adapter for development and testing. No API key required.
 - `src/adapters/anthropic-adapter.ts` -- the Anthropic API adapter. Activated when `ANTHROPIC_API_KEY` is set. To use it: `export ANTHROPIC_API_KEY=sk-...` and replace the mock adapter with the Anthropic adapter in your code.
 
+### Dogfooding (real LLM call)
+
+`npm run example:legal-summarization-anthropic` runs the legal-summarization decision-type against a **real** Anthropic call and writes both the COTS (`examples/output/legal-summarization-anthropic.cots.json`) and a run record (`...run-record.json`: adapter, model, timestamps, SHA-256 of the COTS and decision text) so the run is recorded and reproducible. Requires `ANTHROPIC_API_KEY`; without it the script exits with a clear message and the mock example remains the offline path. Validate the resulting COTS with the conformance suite and render it with `se-trace explore`.
+
 ## Decision-types
 
 Two decision-types are implemented:
